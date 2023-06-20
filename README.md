@@ -13,14 +13,6 @@ $ colcon build
 
 ## Usage
 
-### Launch
-
-```shell
-$ ros2 launch waypoint_navigation waypoint_navigation.launch.py
-```
-
-### Shell Examples
-
 Run simulator:
 
 ```shell

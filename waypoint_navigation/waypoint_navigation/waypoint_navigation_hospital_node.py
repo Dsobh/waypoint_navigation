@@ -2,13 +2,10 @@ from typing import List
 import random
 import rclpy
 
-from geometry_msgs.msg import Pose
-from nav2_msgs.action import NavigateToPose
+from rclpy.logging import LoggingSeverity
 from waypoint_navigation_msgs.action import NavigateToWp
 from waypoint_navigation_msgs.msg import Wp
 from waypoint_navigation_msgs.srv import (
-    AddWp,
-    GetWp,
     GetWps
 )
 
@@ -18,8 +15,8 @@ class WayPointNavigationHospitalNode(Node):
        
     def __init__(self):
         super().__init__("waypoint_navigation_hospital_node")
+        self.get_logger().set_level(rclpy.logging.LoggingSeverity.INFO)
 
-       
         #actions
         #we create an action in the client to navigate
         
@@ -33,18 +30,22 @@ class WayPointNavigationHospitalNode(Node):
         wps_list = self.__gpws_client.call(GetWps.Request())
         final_wps=random.choices(wps_list.wps, k=3)
         
+        self.get_logger().info('3 Points recevived')
         for i in final_wps:
              goal = NavigateToWp.Goal()
              goal.wp_id = i.id
 
-             
+             self.get_logger().info('A point have been received')
              self.__action_client.wait_for_server()
+             
              self.__action_client.send_goal(goal)
-
+             self.get_logger().info('Navigating to the point...')
              self.__action_client.wait_for_result()
+             self.get_logger().info('Point reached')
+
+        self.get_logger().info('All point reached')
 
         
-    
 def main(args=None):
     rclpy.init()
 

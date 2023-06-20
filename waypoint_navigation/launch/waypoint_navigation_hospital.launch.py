@@ -34,8 +34,8 @@ def generate_launch_description():
 
     waypoint_navigation_node_cmd = Node(
         package=pkg_name,
-        executable="waypoint_navigation_hospital_node",
-        name="waypoint_navigation_hospital_node",
+        executable="waypoint_navigation_node",
+        name="waypoint_navigation_node",
         namespace="waypoint_navigation/",
         parameters=[points,
                     {"nav_action": nav_action}]

@@ -19,7 +19,7 @@ def generate_launch_description():
     declare_points_cmd = DeclareLaunchArgument(
         "wps",
         default_value=ament_index_python.get_package_share_directory(
-            pkg_name) + "/params/hospital.yaml",
+            pkg_name) + "/params/apartamento_leon.yaml",
         description="YAML waypoints file")
 
     nav_action = LaunchConfiguration("nav_action")

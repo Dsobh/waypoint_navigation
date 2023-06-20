@@ -25,7 +25,8 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "waypoint_navigation_node = waypoint_navigation.waypoint_navigation_node:main"
+            "waypoint_navigation_node = waypoint_navigation.waypoint_navigation_node:main",
+            "waypoint_navigation_hospital_node = waypoint_navigation.waypoint_navigation_hospital_node:main"
         ],
     },
 )

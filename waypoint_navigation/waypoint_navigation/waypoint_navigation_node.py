@@ -6,9 +6,9 @@ import rclpy
 
 from geometry_msgs.msg import Pose
 from nav2_msgs.action import NavigateToPose
-from waypoint_navigation_interfaces.action import NavigateToWp
-from waypoint_navigation_interfaces.msg import Wp
-from waypoint_navigation_interfaces.srv import (
+from waypoint_navigation_msgs.action import NavigateToWp
+from waypoint_navigation_msgs.msg import Wp
+from waypoint_navigation_msgs.srv import (
     AddWp,
     GetWp,
     GetWps
@@ -184,8 +184,7 @@ class WaypointNavigationNode(Node):
         if self.__action_client.is_succeeded():
             goal_handle.succeed()
 
-        elif self.__action_server.is_canceled():
-            self.__action_server.wait_for_canceling()
+        elif goal_handle.is_cancel_requested:
             goal_handle.canceled()
 
         else:

@@ -19,8 +19,8 @@ from rclpy.qos import QoSProfile
 from rclpy.qos import QoSDurabilityPolicy, QoSHistoryPolicy, QoSReliabilityPolicy
 
 class WayPointNavigationHospitalNode(Node):
-    DISTANCE_THRESHOLD = 1.2
-    OBSTACLE_DISTANCE_THRESHOLD = 1.4
+    DISTANCE_THRESHOLD = 1.3
+    OBSTACLE_DISTANCE_THRESHOLD = 2
 
     def __init__(self):
         super().__init__("waypoint_navigation_hospital_node")
@@ -67,17 +67,14 @@ class WayPointNavigationHospitalNode(Node):
             distance = self.calculate_distance(p1, p2)
             total_distance += distance
             
-        if total_distance > self.previous_distance * WayPointNavigationHospitalNode.DISTANCE_THRESHOLD:
-            self.get_logger().info('Previous distance: {:.2f} meters'.format(self.previous_distance))
-            self.get_logger().info('Total distance: {:.2f} meters'.format(total_distance))
-            
+        #Si la distancia total es mayor que el 20% de la distancia previa...
+        if self.previous_distance != 0 and total_distance > self.previous_distance * WayPointNavigationHospitalNode.DISTANCE_THRESHOLD:
             if min(self.last_scan.ranges) < WayPointNavigationHospitalNode.OBSTACLE_DISTANCE_THRESHOLD:
-                self.get_logger().info('Obstacle detected')
+                self.get_logger().info('Obstacle detected: Distance to the point increase from: {:.2f} meters to {:.2f} meters'.format(self.previous_distance, total_distance))
             else:
                 self.get_logger().info('No obstacle detected')
             self.new_plan = 1
         elif self.new_plan == 1:
-            self.get_logger().info('Replaning')
             self.new_plan = 0
 
         self.previous_distance = total_distance
@@ -86,7 +83,7 @@ class WayPointNavigationHospitalNode(Node):
         self.last_scan = msg
 
     def status_callback(self, msg):
-        current_status = None
+        current_status = "No navigation is running"
         for status in msg.status_list:
             current_goal_id = status.goal_info.goal_id
             if current_goal_id != self.previous_goal_id and current_goal_id not in self.finished_goals:
@@ -102,12 +99,14 @@ class WayPointNavigationHospitalNode(Node):
                 current_status = "Navigation to the goal {}.".format(status_dict[status.status])
                 if status.status in [4, 5, 6]:
                     self.finished_goals.append(current_goal_id)
-        if not current_status:
-            current_status = "No navigation is running."
 
         # Update log when status changed
         if self.navigation_status != current_status:
             self.navigation_status = current_status
+            
+            if status.status == 4:
+                self.previous_distance = 0
+
             self.get_logger().info(current_status)
     
     def run(self):
@@ -127,7 +126,7 @@ class WayPointNavigationHospitalNode(Node):
              self.__action_client.send_goal(goal)
              self.get_logger().info('Navigating to the point...')
              self.__action_client.wait_for_result()
-             self.get_logger().info('Point reached')
+             self.get_logger().info('Waiting for a new point...')
 
         self.get_logger().info('All point reached')
 

@@ -88,7 +88,7 @@ class WayPointNavigationHospitalNode(Node):
             current_goal_id = status.goal_info.goal_id
             if current_goal_id != self.previous_goal_id and current_goal_id not in self.finished_goals:
                 self.previous_goal_id = current_goal_id
-                current_status = "Navigation to a new goal has started"
+                current_status = "Navigation goal received. Starting navigation..."
             if status.status in [2, 4, 5, 6] and current_goal_id not in self.finished_goals:
                 status_dict = {
                     2: "is in progress",
@@ -96,7 +96,7 @@ class WayPointNavigationHospitalNode(Node):
                     5: "was cancelled",
                     6: "has aborted"
                 }
-                current_status = "Navigation to the goal {}.".format(status_dict[status.status])
+                current_status = "Navigation {}.".format(status_dict[status.status])
                 if status.status in [4, 5, 6]:
                     self.finished_goals.append(current_goal_id)
 
@@ -115,20 +115,20 @@ class WayPointNavigationHospitalNode(Node):
         wps_list = self.__gpws_client.call(GetWps.Request())
         final_wps=random.choices(wps_list.wps, k=3)
         
-        self.get_logger().info('Three points have been recevived')
+        self.get_logger().info('Three waypoints have been recevived')
         for i in final_wps:
              goal = NavigateToWp.Goal()
              goal.wp_id = i.id
 
-             self.get_logger().info('A point have been received')
+             self.get_logger().info('A waypoint have been received')
              self.__action_client.wait_for_server()
              
              self.__action_client.send_goal(goal)
-             self.get_logger().info('Navigating to the point number %s' % goal.wp_id)
+             self.get_logger().info('Navigating to the waypoint %s' % goal.wp_id)
              self.__action_client.wait_for_result()
-             self.get_logger().info('Waiting for a new point...')
+             self.get_logger().info('Waiting for a new waypoint...')
 
-        self.get_logger().info('All the points have been reached')
+        self.get_logger().info('All the waypoints have been reached')
 
 def main(args=None):
     rclpy.init()

@@ -72,7 +72,7 @@ class WayPointNavigationHospitalNode(Node):
             if min(self.last_scan.ranges) < WayPointNavigationHospitalNode.OBSTACLE_DISTANCE_THRESHOLD:
                 self.get_logger().info('Obstacle detected: Distance to the point increase from: {:.2f} meters to {:.2f} meters'.format(self.previous_distance, total_distance))
             else:
-                self.get_logger().info('No obstacle detected')
+                self.get_logger().info('Planned path has changed but no obstacle has been detected')
             self.new_plan = 1
         elif self.new_plan == 1:
             self.new_plan = 0
@@ -115,7 +115,7 @@ class WayPointNavigationHospitalNode(Node):
         wps_list = self.__gpws_client.call(GetWps.Request())
         final_wps=random.choices(wps_list.wps, k=3)
         
-        self.get_logger().info('3 Points recevived')
+        self.get_logger().info('Three points have been recevived')
         for i in final_wps:
              goal = NavigateToWp.Goal()
              goal.wp_id = i.id
@@ -124,11 +124,11 @@ class WayPointNavigationHospitalNode(Node):
              self.__action_client.wait_for_server()
              
              self.__action_client.send_goal(goal)
-             self.get_logger().info('Navigating to the point...')
+             self.get_logger().info('Navigating to the point number %s' % goal.wp_id)
              self.__action_client.wait_for_result()
              self.get_logger().info('Waiting for a new point...')
 
-        self.get_logger().info('All point reached')
+        self.get_logger().info('All the points have been reached')
 
 def main(args=None):
     rclpy.init()

@@ -83,7 +83,7 @@ class WayPointNavigationHospitalNode(Node):
         self.last_scan = msg
 
     def status_callback(self, msg):
-        current_status = "No navigation is running"
+        current_status = ""
         for status in msg.status_list:
             current_goal_id = status.goal_info.goal_id
             if current_goal_id != self.previous_goal_id and current_goal_id not in self.finished_goals:
@@ -113,7 +113,7 @@ class WayPointNavigationHospitalNode(Node):
         self.__gpws_client.wait_for_service()
 
         wps_list = self.__gpws_client.call(GetWps.Request())
-        final_wps=random.choices(wps_list.wps, k=3)
+        final_wps=random.sample(wps_list.wps, 3)
         
         self.get_logger().info('Three waypoints have been recevived')
         for i in final_wps:
@@ -124,7 +124,7 @@ class WayPointNavigationHospitalNode(Node):
              self.__action_client.wait_for_server()
              
              self.__action_client.send_goal(goal)
-             self.get_logger().info('Navigating to the waypoint %s' % goal.wp_id)
+             self.get_logger().info('Navigating to the waypoint with ID:%s' % goal.wp_id)
              self.__action_client.wait_for_result()
              self.get_logger().info('Waiting for a new waypoint...')
 
